@@ -1,0 +1,8 @@
+{
+    "configuration": "PSRAM=disabled,CPUFreq=240,UploadSpeed=921600,DebugLevel=none",
+    "board": "Heltec-esp32:esp32:wifi_kit_32",
+    "port": "/dev/tty.usbserial-0001",
+    "intelliSenseGen": "global",
+    "sketch": "WiFiKit-32/WiFiKit-32.ino",
+    "output": "../WiFiKit-32/WiFiKit-32.ino.bin"
+}
