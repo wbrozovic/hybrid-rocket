@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../.."
+		},
+		{
+			"name": "EngineTestStandESP32",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
