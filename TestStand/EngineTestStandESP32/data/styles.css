@@ -1,0 +1,229 @@
+html, body {
+    background-color: #f4f4f9;
+    height: 100%;
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    margin: 0;
+}
+
+.center-card {
+    height: 100%;
+    width: 90%;
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 3px, rgb(0 0 0 / 5%) 0px 1px 2px 0px;
+    margin: 3rem;
+    background-color: #1f1f1e;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.h1 {
+    color: #f4f4f9;
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.h2 {
+    color: #f4f4f9;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+p {
+    color: #f4f4f9;
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+.danger-btn {
+    background-color: #fe4134;
+    border-radius: 4px;
+    color: #f4f4f9;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border: 0px solid transparent;
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 3px, rgb(0 0 0 / 5%) 0px 1px 2px 0px;
+    min-width: fit-content;
+    font-weight: 700;
+    font-size: large;
+}
+
+.danger-btn:hover {
+    background-color: #A20C01;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.danger-btn__yellow {
+    background-color: #FFCB1F;
+    color: #0C0F0A;
+}
+
+.danger-btn__yellow:hover {
+    background-color: #CC9C00;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 3px, rgb(0 0 0 / 5%) 0px 1px 2px 0px;
+    z-index: 10000;
+    visibility: hidden;
+}
+
+.confirm-modal {
+    position: absolute;
+    top: 35%;
+    z-index: 100000;
+    background-color: #A20C01;
+    border-radius: 8px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    visibility: hidden;
+}
+
+.confirm-modal__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.secondary-btn {
+    background-color: transparent;
+    color: #f4f4f9;
+    border: 1px solid #f4f4f9;
+    border-radius: 4px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 3px, rgb(0 0 0 / 5%) 0px 1px 2px 0px;
+    min-width: fit-content;
+    font-weight: 700;
+    font-size: large;
+}
+
+.secondary-btn:hover {
+    color: #D8D8E9;
+    border-color: #D8D8E9;
+    cursor: pointer;
+    transition: border-color, color 0.2s ease-in-out;
+}
+
+.modal-btn-container button:last-child {
+    margin-left: 1rem;
+}
+
+.data-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 2rem;
+    width: inherit;
+}
+
+.ox-data-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2rem;
+    width: 150px;
+    height: 75px;
+}
+
+.ox-valve-meter {
+    height: inherit; 
+    width: inherit; 
+    border-radius: 150px 150px 0 0; 
+    background-color: #f4f4f9;
+}
+
+/* Semi-circle gauge from stack overflow https://stackoverflow.com/questions/67235098/how-to-create-semi-circle-ellipse-with-html-css-like-a-gauge-speedometer*/
+.gauge{
+    height: 85px;
+    /*overflow: hidden;*/
+    position: relative;
+    width: 170px;
+}
+.gauge .arc{
+    background-image:
+        radial-gradient(#1f1f1e 0, #1f1f1e 60%, transparent 60%),
+        conic-gradient(#f4f4f9 0, #93CDF1 100deg, #1982C4 135deg, #093048 180deg, #1f1f1e 180deg, #1f1f1e 360deg);
+    background-position: center center, center center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%, 100% 100%;
+    border-radius: 50%;
+    border-style: none;
+    height: 170px;
+    position: relative;
+    transform: rotate(-90deg);
+    width: 100%;
+}
+.gauge .pointer{
+    background: #f4f4f9;
+    border: 1px solid #f4f4f9;
+    border-radius: 5px;
+    bottom: 0;
+    content: '';
+    height: 6px;
+    left: 0;
+    position: absolute;
+    transform: rotate(135deg) translateX(2px) translateY(-6px);
+    transform-origin: 85px 0;
+    width: 20px;
+    z-index: 5;
+}
+
+.gauge .pointer:hover {
+    cursor: pointer;
+    background-color: #D8D8E9;
+}
+
+.gauge .mask::before,
+.gauge .mask::after{
+    background-image: radial-gradient(transparent 0, transparent 50%, #1f1f1e 50%, #1f1f1e 100%);
+    clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0% 100%);
+    content: '';
+    height: 18px;
+    position: absolute;
+    width: 18px;
+}
+.gauge .mask::before{
+    left: -2px;
+    bottom: 0;
+}
+.gauge .mask::after{
+    bottom: 0;
+    right: -2px;
+}
+.gauge .label{
+    bottom: 20px;
+    font-size: 16px;
+    font-weight: 700;
+    left: 0;
+    line-height: 26px;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    color: #f4f4f9;
+}
