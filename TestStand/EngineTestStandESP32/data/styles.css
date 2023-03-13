@@ -23,6 +23,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-bottom: 2rem;
 }
 
 .h1 {
@@ -136,10 +137,80 @@ p {
 
 .data-container {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     margin-top: 2rem;
     width: inherit;
+}
+
+.number-spinner {
+    height: -webkit-fill-available;
+    border: 1px solid #eee;
+    border-right: none;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    padding-left: 0.75rem;
+}
+
+.spinner-holder {
+
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button
+{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-spinner-btn {
+    /* position: relative; */
+    cursor: pointer;
+    /* border-left: 1px solid #eee; */
+    width: 20px;
+    text-align: center;
+    background-color: #748386;
+    color: #f4f4f9;
+    font-size: 13px;
+    font-family: "Trebuchet MS", Helvetica, sans-serif !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    border: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+}
+
+.number-spinner-btn:hover {
+    background-color: #424B4C;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.number-spinner__btn-up {
+    /* position: absolute; */
+    top: 0;
+    right: 0;
+    height: 50%;
+    width: 2rem;
+    border-top-right-radius: 4px;
+}
+.number-spinner__btn-down {
+    /* position: absolute; */
+    bottom: -1px;
+    right: 0;
+    height: 50%;
+    width: 2rem;
+    border-bottom-right-radius: 4px;
 }
 
 .ox-data-container {
@@ -147,8 +218,7 @@ p {
     flex-direction: column;
     align-items: center;
     margin-top: 2rem;
-    width: 150px;
-    height: 75px;
+    flex-grow: 1;
 }
 
 .ox-valve-meter {
@@ -160,11 +230,27 @@ p {
 
 /* Semi-circle gauge from stack overflow https://stackoverflow.com/questions/67235098/how-to-create-semi-circle-ellipse-with-html-css-like-a-gauge-speedometer*/
 .gauge{
-    height: 85px;
-    /*overflow: hidden;*/
-    position: relative;
-    width: 170px;
+    height: 1.5rem;
+    flex-grow: 1;
+    width: -webkit-fill-available;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
 }
+.gauge-overlay {
+    position: relative;
+    top: 0;
+    left: 0;
+    background-color: #1982C4;
+    width: 0%;
+    height: inherit;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.ox-gauge {
+    background-color: #f4f4f9;
+}
+
 .gauge .arc{
     background-image:
         radial-gradient(#1f1f1e 0, #1f1f1e 60%, transparent 60%),
@@ -226,4 +312,9 @@ p {
     text-align: center;
     width: 100%;
     color: #f4f4f9;
+}
+
+.spacer {
+    flex-grow: 1;
+    width: inherit;
 }
