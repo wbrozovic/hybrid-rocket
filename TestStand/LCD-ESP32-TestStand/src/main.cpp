@@ -68,9 +68,9 @@ void setup()
 
 void loop()
 {
-    IgnitionVal = analogRead(IGNITION_IN);
-    Serial.printf("Ignition Value: %d", IgnitionVal);
+    //IgnitionVal = ;
+    Serial.printf("Ignition Value: %d", analogRead(IGNITION_IN));
     Serial.println();
-    delay(1000);
+    
 
 }
