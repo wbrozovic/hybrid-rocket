@@ -6,4 +6,4 @@
 
 - Lilygo ESP32: https://github.com/Xinyuan-LilyGO/TTGO-T-Display
     
-- HTML on ESP32 - Flash Storage: https://tttapa.github.io/ESP8266/Chap11%20-%20SPIFFS.html
+- File System - SPIFFS: https://tttapa.github.io/ESP8266/Chap11%20-%20SPIFFS.html
