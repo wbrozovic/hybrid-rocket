@@ -1,6 +1,6 @@
 # Lilygo LCD ESP32
 
-##References
+## References
 - Espresif espidf: https://github.com/espressif/esp-idf
     - https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html
 
