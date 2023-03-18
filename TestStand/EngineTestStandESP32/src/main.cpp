@@ -29,8 +29,8 @@
 #define LEVEL_SHIFT_5_OUTPUT 12
 
 // Replace with your network credentials
-const char *ssid = "DMS Member";
-const char *password = "dms--109238";
+const char *ssid = "HottyToddy";//"DMS Member";
+const char *password = "104Tanglewood";  //"dms--109238";
 
 AsyncWebServer server(80);
 
@@ -87,14 +87,26 @@ void configureWiFi()
   // g_OLED.sendBuffer();
 }
 
+void DrawIPToOLED()
+{
+  Heltec.display -> clear();
+  Heltec.display -> drawString(0, 0, "Engine Test Stand v0.1");
+  Heltec.display -> drawString(0, 15, (WiFi.localIP().toString()));
+  Heltec.display -> drawString(0, 50, "Count OFF");
+  Heltec.display -> display();
+}
+
+void DrawStringToOLED(String str)
+{
+  Heltec.display -> clear();
+  Heltec.display -> drawString(0, 0, "Engine Test Stand v0.1");
+  Heltec.display -> drawString(0, 15, (WiFi.localIP().toString()));
+  Heltec.display -> drawString(0, 50, "New String: " + str);
+  Heltec.display -> display();
+}
+
 void initWifi() 
 {
-  if (!SPIFFS.begin(true))
-  {
-    Serial.println("An Error has occurred while mounting SPIFFS");
-    return;
-  }
-
   //Connect to WiFi network
   Serial.println("Connecting to WiFi network: " + String(ssid));
   WiFi.begin(ssid, password);
@@ -105,7 +117,6 @@ void initWifi()
   }
 
   Serial.printf("Connected to the WiFi network %s", WiFi.localIP().toString());
-
   
 
   // Route for root / web page
@@ -123,7 +134,17 @@ void initWifi()
     request->send(SPIFFS, "/control-center.js", "text/javascript");
   });
 
+  // GET Oxidizer value change
+  server.on("/oxidizer?oxVal=", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String newOxidizerValue = request->arg("oxVal");
+    Serial.println("Oxidizer Value: " + newOxidizerValue);
+    request->send(200, "text/plain", "Oxidizer Value: " + newOxidizerValue);
+    DrawStringToOLED(newOxidizerValue);
+    //request->method() == HTTP_POST;
+  });
+
   server.begin();
+  DrawIPToOLED();
 }
 
 void setup()
@@ -132,30 +153,34 @@ void setup()
   
   initPins();
 
+
+  if (!SPIFFS.begin(true))
+  {
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+  }
   digitalWrite(LED_BUILTIN, HIGH);
 
   //Display IP Address on Heltec OLED
   Heltec.begin(true /*DisplayEnable Enable*/, false /*LoRa Disable*/, true /*Serial Enable*/, true /*PABOOST Enable*/, 470E6 /**/);
-  Heltec.display -> clear();
-  Heltec.display -> drawString(0, 0, "Engine Test Stand v0.1");
-  Heltec.display -> drawString(0, 15, (WiFi.localIP().toString()));
-  Heltec.display -> drawString(0, 50, "Count OFF");
-  Heltec.display -> display();
   
+  delay(2000);
+  initWifi();
+  digitalWrite(BUTTON, LOW);
 }
 
 
 void loop()
 {
-  int buttonState = digitalRead(BUTTON);
+  buttonState = digitalRead(BUTTON);
   if (buttonState == HIGH)
   {
-    Serial.println("Button Pressed");
+    //Serial.println("Button Pressed");
     digitalWrite(ENG_IGNITE_OUTPUT, LOW);
   }
   else
   {
-    Serial.println("Button Not Pressed");
+    //Serial.println("Button Not Pressed");
     digitalWrite(ENG_IGNITE_OUTPUT, HIGH);
   }
   delay(10);
