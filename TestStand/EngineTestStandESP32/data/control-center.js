@@ -92,6 +92,19 @@ function setNumberSpinners() {
 
 setNumberSpinners();
 
+async function sendOxUpdate(value) {
+    var oxUpdate = value;
+    const sendOxUpdate = async () => {
+        const response = await fetch(`/oxidizer?oxVal=${oxUpdate}`)
+          .then(response => response.text())
+          .then(data => JSON.parse(data))
+          .catch(err => console.log(err));
+        
+        console.log(response);
+    };
+    return await sendOxUpdate();
+}
+
 function increment(event) {
     var inputId = event.currentTarget.attributes['input-id'].value;
     var input = document.getElementById(inputId);
@@ -100,7 +113,7 @@ function increment(event) {
     if (value >= 100) return
     value++;
     input.value = value + '%';
-
+    sendOxUpdate(value);
     updateGuage(value);
 }
 
