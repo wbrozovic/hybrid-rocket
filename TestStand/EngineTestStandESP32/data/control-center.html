@@ -1,53 +1,117 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Engine Testing</title>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="styles.css" />
+		<link
+			rel="preconnect"
+			href="https://fonts.googleapis.com" />
+		<link
+			rel="preconnect"
+			href="https://fonts.gstatic.com"
+			crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;700&display=swap"
+			rel="stylesheet" />
+	</head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Engine Testing</title>
-  <link rel="stylesheet" type="text/css" href="styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;700&display=swap" rel="stylesheet" />
-</head>
+	<body>
+		<script
+			type="text/javascript"
+			src="./control-center.js"
+			defer></script>
+		<div
+			id="modal-overlay"
+			class="modal-overlay"></div>
+		<div
+			id="center-card"
+			class="center-card">
+			<h1
+				id="control-center__header"
+				class="h1">
+				Control Center
+			</h1>
 
-<body>
-  <script type="text/javascript" src="./control-center.js" defer></script>
-  <div id="modal-overlay" class="modal-overlay"></div>
-  <div id="center-card" class="center-card">
-    <h1 id="control-center__header" class="h1">Control Center</h1>
-
-    <div id="data-container" class="data-container">
-      <div id="ox-data-container" class="ox-data-container">
-        <h2 id="ox-data-container__header" class="h2">Oxidizer</h2>
-        <div id='ox-guage' class="gauge ox-gauge">
-          <div id="gauge-color-overlay" class="gauge-overlay"></div>
-        </div>
-        <div id="ox-spinner-holder" class="spinner-holder ox-spinner" spinner-id="ox">
-          <input id="ox" type="text" class="number-spinner" placeholder="% open" onblur="appendPercent(event)" onfocusout="appendPercent(event)"></input>
-        </div>
-      </div>
-    </div>
-    <div id="spacer" class="spacer"></div>
-    <button id="engine-ignition" class="danger-btn danger-btn__yellow" onclick="areYouSure(event)">
-      Ignite Engine
-    </button>
-  </div>
-  <div id="countdown-modal" class="confirm-modal">
-    <div id="countdown-modal__content" class="confirm-modal__content">
-      <h1 id="countdown-modal__header" class="h1">Are you sure?</h1>
-      <p id="countdown-modal__text" class="p">
-        This will start the 10 second countdown and ignite the engine.
-      </p>
-      <div id="countdown-modal__buttons" class="modal-btn-container">
-        <button id="countdown-modal__cancel" class="cancel-btn secondary-btn" onclick="cancelIgnition()">
-          Cancel
-        </button>
-        <button id="countdown-modal__confirm" class="confirm-btn danger-btn" onclick="beginCountDown()">
-          Confirm
-        </button>
-      </div>
-    </div>
-  </div>
-</body>
-
+			<div
+				id="data-container"
+				class="data-container">
+				<div
+					id="ox-data-container"
+					class="ox-data-container">
+					<h2
+						id="ox-data-container__header"
+						class="h2">
+						Oxidizer
+					</h2>
+					<div
+						id="ox-guage"
+						class="gauge ox-gauge">
+						<div
+							id="gauge-color-overlay"
+							class="gauge-overlay"></div>
+					</div>
+					<div
+						id="ox-spinner-holder"
+						class="spinner-holder ox-spinner"
+						spinner-id="ox">
+						<input
+							id="ox"
+							type="text"
+							class="number-spinner"
+							placeholder="% open"
+							onblur="appendPercent(event)"
+							onfocusout="appendPercent(event)" />
+					</div>
+				</div>
+			</div>
+			<div
+				id="spacer"
+				class="spacer"></div>
+			<button
+				id="engine-ignition"
+				class="danger-btn danger-btn__yellow"
+				onclick="areYouSure(event)">
+				Ignite Engine
+			</button>
+		</div>
+		<div
+			id="countdown-modal"
+			class="confirm-modal">
+			<div
+				id="countdown-modal__content"
+				class="confirm-modal__content">
+				<h1
+					id="countdown-modal__header"
+					class="h1">
+					Are you sure?
+				</h1>
+				<p
+					id="countdown-modal__text"
+					class="p">
+					This will start the 10 second countdown and ignite the
+					engine.
+				</p>
+				<div
+					id="countdown-modal__buttons"
+					class="modal-btn-container">
+					<button
+						id="countdown-modal__cancel"
+						class="cancel-btn secondary-btn"
+						onclick="cancelIgnition()">
+						Cancel
+					</button>
+					<button
+						id="countdown-modal__confirm"
+						class="confirm-btn danger-btn"
+						onclick="beginCountDown()">
+						Confirm
+					</button>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
