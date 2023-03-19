@@ -144,7 +144,8 @@ p {
 }
 
 .number-spinner {
-    height: -webkit-fill-available;
+    /* height: 100%; */
+    flex-grow: 1;
     border: 1px solid #eee;
     border-right: none;
     border-top-right-radius: 0px;
@@ -155,7 +156,7 @@ p {
 }
 
 .spinner-holder {
-
+    display: flex;
 }
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button

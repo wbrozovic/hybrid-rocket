@@ -80,7 +80,7 @@ function setNumberSpinners() {
         let id = spinner.attributes['spinner-id'].value;
 
         customSpinnerHtml = `
-        <div style="position: relative; float: right; position: relative; height: 100%;">
+        <div style="position: relative; float: right; position: relative; flex-grow: 1;">
           <button input-id=${id} class="number-spinner__btn-up number-spinner-btn" onclick="increment(event)">+</button>
           <button input-id=${id} class="number-spinner__btn-down number-spinner-btn" onclick="decrement(event)">-</button>
         </div>
@@ -151,3 +151,22 @@ function updateGuage(value) {
       gauge.style.borderBottomRightRadius = '0';
     }
 }
+
+async function GetOxValue() {
+    const getOxValue = async () => {
+        const response = await fetch(`/oxidizer`)
+          .then(response => response.text())
+          .then(data => JSON.parse(data))
+          .catch(err => console.log(err));
+        console.table(response);
+        return response;
+    };
+    const oxValue = await getOxValue();
+    updateGuage(oxValue);
+}
+
+function ControlLoop() {
+    GetOxValue();
+}
+
+setInterval(ControlLoop, 50);

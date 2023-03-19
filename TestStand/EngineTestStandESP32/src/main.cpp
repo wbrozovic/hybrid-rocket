@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <U8g2lib.h>
 #include <WiFi.h>
 #include "SPIFFS.h"
@@ -21,16 +22,16 @@
 #define HX711_CLK_PIN_INPUT 22
 #define HX711_DATA_PIN_INPUT 23
 
-#define LEVEL_SHIFT_1_INPUT 34
-#define LEVEL_SHIFT_2_INPUT 35
+#define OX_LEVEL_SHIFT_1_INPUT 34
+#define OX_LEVEL_SHIFT_2_INPUT 35
 
 #define LEVEL_SHIFT_3_OUTPUT 14
 #define LEVEL_SHIFT_4_OUTPUT 13
 #define LEVEL_SHIFT_5_OUTPUT 12
 
 // Replace with your network credentials
-const char *ssid = "HottyToddy";//"DMS Member";
-const char *password = "104Tanglewood";  //"dms--109238";
+const char *ssid = "DMS Member"; //"HottyToddy"
+const char *password = "dms--109238"; //"104Tanglewood"
 
 AsyncWebServer server(80);
 
@@ -61,32 +62,15 @@ static void initPins()
   pinMode(HX711_CLK_PIN_INPUT, INPUT);
   pinMode(HX711_DATA_PIN_INPUT, INPUT);
 
-  pinMode(LEVEL_SHIFT_1_INPUT, INPUT);
-  pinMode(LEVEL_SHIFT_2_INPUT, INPUT);
+  pinMode(OX_LEVEL_SHIFT_1_INPUT, INPUT);
+  pinMode(OX_LEVEL_SHIFT_2_INPUT, INPUT);
   pinMode(LEVEL_SHIFT_3_OUTPUT, OUTPUT);
   pinMode(LEVEL_SHIFT_4_OUTPUT, OUTPUT);
   // pinMode(LEVEL_SHIFT_5, OUTPUT);
   pinMode(LEVEL_SHIFT_5_OUTPUT, OUTPUT);
 }
 
-void configureWiFi()
-{
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  g_OLED.setCursor(3, g_lineHeight * 2 + 10);
-  Serial.println("Connected to the WiFi network");
-
-  g_OLED.setCursor(3, g_lineHeight * 4 + 10);
-  g_OLED.printf("Connected to\n %s", WiFi.localIP().toString().c_str());
-  // g_OLED.sendBuffer();
-}
-
+  
 void DrawIPToOLED()
 {
   Heltec.display -> clear();
@@ -118,6 +102,10 @@ void initWifi()
 
   Serial.printf("Connected to the WiFi network %s", WiFi.localIP().toString());
   
+  // Route for favicon.ico
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/favicon.ico", "image/avif");
+  });
 
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -134,15 +122,15 @@ void initWifi()
     request->send(SPIFFS, "/control-center.js", "text/javascript");
   });
 
-  // GET Oxidizer value change
-  server.on("/oxidizer?oxVal=", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String newOxidizerValue = request->arg("oxVal");
-    Serial.println("Oxidizer Value: " + newOxidizerValue);
-    request->send(200, "text/plain", "Oxidizer Value: " + newOxidizerValue);
-    DrawStringToOLED(newOxidizerValue);
-    //request->method() == HTTP_POST;
+  // GET Oxidizer value
+  server.on("/oxidizer", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String oxidizerValue = String(analogRead(OX_LEVEL_SHIFT_1_INPUT));
+    Serial.printf("Oxidizer Value: %s", oxidizerValue);
+    Serial.println();
+    request->send(200, "text/plain", oxidizerValue);
   });
 
+  server.serveStatic("/", SPIFFS, "/").setDefaultFile("control-center.html");
   server.begin();
   DrawIPToOLED();
 }
@@ -153,10 +141,12 @@ void setup()
   
   initPins();
 
-
+  // Mount SPIFFS
+  String spiffsError = "An Error has occurred while mounting SPIFFS";
   if (!SPIFFS.begin(true))
   {
     Serial.println("An Error has occurred while mounting SPIFFS");
+    DrawStringToOLED(spiffsError);
     return;
   }
   digitalWrite(LED_BUILTIN, HIGH);
@@ -167,148 +157,12 @@ void setup()
   delay(2000);
   initWifi();
   digitalWrite(BUTTON, LOW);
+  
 }
 
 
 void loop()
 {
-  buttonState = digitalRead(BUTTON);
-  if (buttonState == HIGH)
-  {
-    //Serial.println("Button Pressed");
-    digitalWrite(ENG_IGNITE_OUTPUT, LOW);
-  }
-  else
-  {
-    //Serial.println("Button Not Pressed");
-    digitalWrite(ENG_IGNITE_OUTPUT, HIGH);
-  }
-  delay(10);
 
-  // digitalWrite(ENG_IGNITE_OUTPUT, HIGH);
-  // delay(10);
-  // digitalWrite(ENG_IGNITE_OUTPUT, LOW);
-  
-
-  //digitalWrite(LED_BUILTIN, HIGH);
 }
 
-
-// const char html[] PROGMEM = R"(
-// <!DOCTYPE html>
-// <html>
-// <head>
-//   <title>Geiger Counter</title>
-//   <style>
-//     body {
-//       font-family: Arial, sans-serif;
-//       margin: 0;
-//       padding: 0;
-//       background-color: #f2f2f2;
-//     }
-
-//     h1 {
-//       background-color: #333;
-//       color: white;
-//       padding: 10px;
-//       text-align: center;
-//       margin: 0;
-//     }
-
-//     form {
-//       margin-top: 20px;
-//       display: flex;
-//       flex-direction: column;
-//       align-items: center;
-//     }
-
-//     label {
-//       font-size: 18px;
-//       margin-bottom: 10px;
-//     }
-
-//     input[type=number] {
-//       padding: 10px;
-//       border: none;
-//       border-radius: 5px;
-//       box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-//       width: 100%;
-//       max-width: 200px;
-//       margin-bottom: 20px;
-//       font-size: 16px;
-//       text-align: center;
-//     }
-
-//     #counterValue {
-//       font-size: 48px;
-//       text-align: center;
-//       margin-top: 50px;
-//     }
-
-//     #switchButton {
-//       background-color: #4CAF50;
-//       color: white;
-//       padding: 10px;
-//       border: none;
-//       border-radius: 5px;
-//       box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-//       width: 100%;
-//       max-width: 200px;
-//       cursor: pointer;
-//       transition: background-color 0.3s ease;
-//       font-size: 18px;
-//     }
-
-//     #switchButton:hover {
-//       background-color: #3e8e41;
-//     }
-
-//         /* Style the container */
-//     .container {
-//       text-align: center;
-//       margin: 20px auto;
-//       max-width: 500px;
-//       background-color: white;
-//       border-radius: 5px;
-//       box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-//       padding: 20px;
-//     }
-//   </style>
-//   <script>
-//     var refreshInterval = 1;
-
-//     function updateCounterValue() {
-//       fetch('/counter')
-//         .then(response => response.text())
-//         .then(data => {
-//           document.getElementById('counterValue').innerText = data;
-//         });
-//     }
-
-//     setInterval(updateCounterValue, refreshInterval * 1000);
-
-//     function handleRefreshIntervalChange() {
-//       refreshInterval = document.getElementById('refreshInterval').value;
-//       clearInterval();
-//       setInterval(updateCounterValue, refreshInterval * 1000);
-//     }
-
-//     function switchCounter() {
-//       fetch('/switchCounter');
-//     }
-//   </script>
-// </head>
-// <body>
-//   <h1>Geiger Counter</h1>
-//   <div class='container'>
-//     <form>
-//       <label for='refreshInterval'>Refresh Interval (in seconds):</label>
-//       <input type='number' id='refreshInterval' value='1' onchange='handleRefreshIntervalChange()'>
-//     </form>
-//        <div>
-//    <button id='switchButton' onclick='switchCounter()'>Switch (ON/OFF)</button>
-//  </div>
-//     <div id='counterValue'>0</div>
-//   </div>
-// </html>
-//   )";
