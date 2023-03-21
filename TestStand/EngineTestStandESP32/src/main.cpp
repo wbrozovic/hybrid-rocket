@@ -5,6 +5,7 @@
 #include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
 #include <heltec.h>
+#include "../include/local_wifi_cred.h"
 
 /**
  * U8g2 Constructor for ESP32
@@ -30,8 +31,8 @@
 #define LEVEL_SHIFT_5_OUTPUT 12
 
 // Replace with your network credentials
-const char *ssid = "YOUR_WIFI";
-const char *password = "YOUR_WIFI";
+const char *network = ssid;
+const char *pass = password;
 
 
 AsyncWebServer server(80);
