@@ -70,8 +70,8 @@ void loop()
 {
     analogWrite(OX_ANGLE_ENCODER_1_OUT, 128);
     analogWrite(OX_ANGLE_ENCODER_2_OUT, 128);
-    Serial.printf("oxVal_1: %d, oxVal_2: %d\n", oxVal, oxVal2);
-    Serial.println();
+    // Serial.printf("oxVal_1: %d, oxVal_2: %d\n", oxVal, oxVal2);
+    // Serial.println();
 
     delay(50);
 }
