@@ -32,14 +32,14 @@ void WIFISetUp(void)
     delay(1000);
     WiFi.mode(WIFI_STA);
     WiFi.setAutoConnect(true);
-    String ssid = "ATT5RBHHBg";
+    String ssid = "YOUR_WIFI";
     String wifistatus = GetWiFiStatusString(WiFi.status());
     
     Heltec.display->drawString(0, 0, "WIFI Status:");
     Heltec.display->drawString(0, 10, wifistatus);
     Heltec.display->display();
     delay(2000);
-    WiFi.begin("ATT5RBHHBg", "t8pqzu+4mmch");
+    WiFi.begin("YOURWIFI", "YOURWIFI");
     delay(100);
 
     byte count = 0;

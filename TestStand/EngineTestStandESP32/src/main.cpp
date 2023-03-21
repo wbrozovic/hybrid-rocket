@@ -30,8 +30,9 @@
 #define LEVEL_SHIFT_5_OUTPUT 12
 
 // Replace with your network credentials
-const char *ssid = "DMS Member"; //"HottyToddy"
-const char *password = "dms--109238"; //"104Tanglewood"
+const char *ssid = "YOUR_WIFI";
+const char *password = "YOUR_WIFI";
+
 
 AsyncWebServer server(80);
 
@@ -156,7 +157,6 @@ void setup()
   
   delay(2000);
   initWifi();
-  digitalWrite(BUTTON, LOW);
   
 }
 
