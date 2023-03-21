@@ -30,8 +30,8 @@
 #define LEVEL_SHIFT_5_OUTPUT 12
 
 // Replace with your network credentials
-const char ***REMOVED*** = "YOUR_WIFI";
-const char ***REMOVED*** = "YOUR_WIFI";
+const char *ssid = "YOUR_WIFI";
+const char *password = "YOUR_WIFI";
 
 
 AsyncWebServer server(80);
