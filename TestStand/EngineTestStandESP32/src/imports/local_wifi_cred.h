@@ -1,2 +1,2 @@
-#define SSID "ATT5RBHHBq"
-#define PASSWORD "t8pqzu+4mmch"
+#define SSID "YOUR_CREDENTIALS"
+#define PASSWORD "YOUR_CREDENTIALS"
