@@ -1,3 +1,7 @@
+var ThrustMasterSeries = new Array(100);
+ThrustMasterSeries.fill(0);
+
+
 function areYouSure(event) {
     if (confirm("Are you sure?")) {
         finalConfirmation();
@@ -80,7 +84,7 @@ function setNumberSpinners() {
         let id = spinner.attributes['spinner-id'].value;
 
         customSpinnerHtml = `
-        <div style="position: relative; float: right; position: relative; flex-grow: 1;">
+        <div style="position: relative; float: right; position: relative;">
           <button input-id=${id} class="number-spinner__btn-up number-spinner-btn" onclick="increment(event)">+</button>
           <button input-id=${id} class="number-spinner__btn-down number-spinner-btn" onclick="decrement(event)">-</button>
         </div>
@@ -90,7 +94,7 @@ function setNumberSpinners() {
     });
 }
 
-setNumberSpinners();
+//setNumberSpinners();
 
 async function sendOxUpdate(value) {
     var oxUpdate = value;
@@ -169,4 +173,100 @@ function ControlLoop() {
     GetOxValue();
 }
 
-setInterval(ControlLoop, 50);
+async function SetOxygenOpen(event) {
+    const setOxygenOpen = async () => {
+        const response = await fetch(`/oxidizer-spin`)
+          .then(response => response.text())
+          .then(data => JSON.parse(data))
+          .catch(err => console.log(err));
+        console.table(response);
+        return response;
+    };
+    const oxValue = await setOxygenOpen();
+    updateGuage(oxValue);
+}
+
+document.getElementById("ox-open-btn").addEventListener("click", TickOxygenOpened);
+document.getElementById("ox-close-btn").addEventListener("click", TickOxygenClosed);
+
+async function TickOxygenOpened(event) {
+    const tickOxygenOpened = async () => {
+        const response = await fetch(`/oxidizer-tick-open`)
+            .then(response => response.text())
+            .then(data => JSON.parse(data))
+            .catch(err => console.log(err));
+        return response;
+    };
+    const response = await tickOxygenOpened()
+        .then((resp) => {
+            console.log('Tick ox open: ', resp);
+            updateGuage(resp);
+        });
+}
+
+async function TickOxygenClosed(event) {
+    const tickOxygenClosed = async () => {
+        const response = await fetch(`/oxidizer-tick-close`)
+            .then(response => response.text())
+            .then(data => JSON.parse(data))
+            .catch(err => console.log(err));
+        return response;
+    };
+    const response = await tickOxygenClosed()
+        .then((resp) => {
+            console.log('Tick ox closed: ', resp);
+            updateGuage(resp);
+        });
+}
+
+
+async function GetThrustLoad() {
+    const getThrustLoad = async () => {
+        const response = await fetch(`/thrust-load`)
+          .then(response => response.text())
+          .then(data => JSON.parse(data))
+          .catch(err => console.log(err));
+        console.table(response);
+        return response;
+    };
+    const thrustLoad = await getThrustLoad();
+
+    updateThrustLoadChart(thrustLoad.thrust);
+}
+
+/**
+ * 
+ * @param {{}} thrustLoadReadings 
+ */
+async function updateThrustLoadChart(thrustLoadReadings) {
+    ThrustMasterSeries.splice(0, 10);
+    ThrustMasterSeries = ThrustMasterSeries.concat(thrustLoadReadings);
+
+    var thrustChartContainer = document.getElementById("ascii-chart-container");
+    thrustChartContainer.innerHTML = asciichart.plot(ThrustMasterSeries); //, { height: height });
+    console.log(asciichart.plot(ThrustMasterSeries));
+}
+
+//setInterval(ControlLoop, 50);
+var GetThrustLoadID = null;
+async function InitThrustInterval() {
+    var thrustBtn = document.getElementById("thrust-stream-btn");
+    thrustBtn.removeEventListener("click", InitThrustInterval);
+    thrustBtn.addEventListener("click", StopThrustInterval);
+    thrustBtn.innerHTML = "Stop Thrust Readings";
+    GetThrustLoadID = setInterval(GetThrustLoad, 500);
+}
+
+function StopThrustInterval() {
+    var thrustBtn = document.getElementById("thrust-stream-btn");
+    thrustBtn.removeEventListener("click", StopThrustInterval);
+    thrustBtn.addEventListener("click", InitThrustInterval);
+    thrustBtn.innerHTML = "Read Thrust";
+    clearInterval(GetThrustLoadID);
+}
+
+var thrustChartContainer = document.getElementById("ascii-chart-container");
+thrustChartContainer.innerHTML = asciichart.plot(ThrustMasterSeries, { height: 50 });
+
+var thrustBtn = document.getElementById("thrust-stream-btn");
+thrustBtn.addEventListener("click", InitThrustInterval);

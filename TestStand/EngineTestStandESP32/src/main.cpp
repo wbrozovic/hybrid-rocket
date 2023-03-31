@@ -3,14 +3,15 @@
 #include <U8g2lib.h>
 #include <WiFi.h>
 #include "SPIFFS.h"
-#include "ESPAsyncWebServer.h"
-#include <heltec.h>
-#include "../include/local_wifi_cred.h"
 
-/**
- * U8g2 Constructor for ESP32
- * U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/
-// U8X8_PIN_NONE);
+#include <heltec.h>
+#include <ESP32Encoder.h>
+#include <HX711.h>
+
+#include "./imports/Motor.h"
+#include "./imports/Server.h"
+#include "./imports/LoadCell.h"
+#include "./imports/local_wifi_cred.h"
 
 #define OLED_CLOCK 15 // PINS FOR THE OLED DISPLAY
 #define OLED_DATA 4
@@ -23,37 +24,24 @@
 #define HX711_CLK_PIN_INPUT 22
 #define HX711_DATA_PIN_INPUT 23
 
-#define OX_LEVEL_SHIFT_1_INPUT 34
-#define OX_LEVEL_SHIFT_2_INPUT 35
+#define OX_ANGLE_ENCODER_1_IN 34
+#define OX_ANGLE_ENCODER_2_IN 35
 
-#define LEVEL_SHIFT_3_OUTPUT 14
-#define LEVEL_SHIFT_4_OUTPUT 13
-#define LEVEL_SHIFT_5_OUTPUT 12
+#define ENABLE_A_OUT 14
+#define INPUT_2 13
+#define INPUT_1 12
 
-// Replace with your network credentials
-const char *network = ssid;
-const char *pass = password;
+const char *ssid = SSID;
+const char *password = PASSWORD;
+
+ESP32Encoder encoder;
+ESP32Encoder encoder2;
 
 
-AsyncWebServer server(80);
+CustomAsyncWebServer myServer(80);
+Motor motor = Motor(ENABLE_A_OUT, INPUT_1, INPUT_2);
 
-// Replaces placeholder with LED state value
-String processor(const String& var){
-  Serial.println(var);
-  if(var == "STATE"){
-    if(digitalRead(LED_BUILTIN)){
-      return "ON";
-    } else {
-      return "OFF";
-    }
-  }
-  return String();
-}
-
-// OLED Constructor
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C g_OLED(U8G2_R2, OLED_RESET, OLED_CLOCK, OLED_DATA);
-int g_lineHeight = 0;
-int buttonState = 0;
+LoadCell loadCell = LoadCell(HX711_DATA_PIN_INPUT, HX711_CLK_PIN_INPUT, 71490);
 
 static void initPins()
 {
@@ -64,37 +52,91 @@ static void initPins()
   pinMode(HX711_CLK_PIN_INPUT, INPUT);
   pinMode(HX711_DATA_PIN_INPUT, INPUT);
 
-  pinMode(OX_LEVEL_SHIFT_1_INPUT, INPUT);
-  pinMode(OX_LEVEL_SHIFT_2_INPUT, INPUT);
-  pinMode(LEVEL_SHIFT_3_OUTPUT, OUTPUT);
-  pinMode(LEVEL_SHIFT_4_OUTPUT, OUTPUT);
-  // pinMode(LEVEL_SHIFT_5, OUTPUT);
-  pinMode(LEVEL_SHIFT_5_OUTPUT, OUTPUT);
+  pinMode(ENABLE_A_OUT, OUTPUT);
+  pinMode(INPUT_2, OUTPUT);
+
+  pinMode(INPUT_1, OUTPUT);
 }
 
-  
 void DrawIPToOLED()
 {
-  Heltec.display -> clear();
-  Heltec.display -> drawString(0, 0, "Engine Test Stand v0.1");
-  Heltec.display -> drawString(0, 15, (WiFi.localIP().toString()));
-  Heltec.display -> drawString(0, 50, "Count OFF");
-  Heltec.display -> display();
+  Heltec.display->clear();
+  Heltec.display->drawString(0, 0, "Engine Test Stand v0.1");
+  Heltec.display->drawString(0, 15, (WiFi.localIP().toString()));
+  Heltec.display->drawString(0, 50, "Count OFF");
+  Heltec.display->display();
 }
 
 void DrawStringToOLED(String str)
 {
-  Heltec.display -> clear();
-  Heltec.display -> drawString(0, 0, "Engine Test Stand v0.1");
-  Heltec.display -> drawString(0, 15, (WiFi.localIP().toString()));
-  Heltec.display -> drawString(0, 50, "New String: " + str);
-  Heltec.display -> display();
+  Heltec.display->clear();
+  Heltec.display->drawString(0, 0, "Engine Test Stand v0.1");
+  Heltec.display->drawString(0, 15, (WiFi.localIP().toString()));
+  Heltec.display->drawString(0, 50, "New String: " + str);
+  Heltec.display->display();
 }
 
-void initWifi() 
+int MeasureMotorCurrent()
 {
-  //Connect to WiFi network
+  //Placeholder
+  int L298N_CURRENT_SENSE = 0;
+  int current = 0;
+  for (int i = 0; i < 10; i++)
+  {
+    current += analogRead(L298N_CURRENT_SENSE);
+  }
+  return current / 10;
+}
+
+int EstimateMotorTorqueWithCurrentFlow()
+{
+  //Placeholder
+  int L298_PLACEHOLDER = 0;
+  int torque = 0;
+  int current = MeasureMotorCurrent();
+  /**
+   * 1. Get current flow
+   * 2. If current flow is >= SOME_THRESHOLD
+   * 2a. Then valve == closed, stop rotation, notify client
+   * 2b. Else valve == open, continue rotation
+   * 
+   */
+  return torque / 10;
+}
+
+void InitServerEndpoints() 
+{
+  myServer.SetOxidizerTickOpenHandler([](){
+    motor.RotateMotorForwards();
+    delay(1000);
+    motor.stop();
+    return encoder.getCount();
+  });
+
+  myServer.SetOxidizerTickCloseHandler([](){
+    motor.RotateMotorBackwards();
+    delay(1000);
+    motor.stop();
+    return encoder.getCount();
+  });
+
+  myServer.SetThrustReadingHandler([](){
+    String thrustReadings = "{\"thrust\": [";
+    for (int i = 0; i < 10; i++)
+    {
+      Serial.println("Thrust Reading: " + thrustReadings);
+      thrustReadings += i < 9 ? String(loadCell.getLoad()) + ", " : String(loadCell.getLoad());
+    }
+
+    return thrustReadings + "]}";
+  });
+}
+
+void InitWifi()
+{
+  // Connect to WiFi network
   Serial.println("Connecting to WiFi network: " + String(ssid));
+
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -103,44 +145,31 @@ void initWifi()
   }
 
   Serial.printf("Connected to the WiFi network %s", WiFi.localIP().toString());
-  
-  // Route for favicon.ico
-  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/favicon.ico", "image/avif");
-  });
 
-  // Route for root / web page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/control-center.html", "text/html");
-  });
-
-  // Route for CSS
-  server.on("/styles.css", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/styles.css", "text/css");
-  });
-
-  // Route for JavaScript
-  server.on("/control-center.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/control-center.js", "text/javascript");
-  });
-
-  // GET Oxidizer value
-  server.on("/oxidizer", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String oxidizerValue = String(analogRead(OX_LEVEL_SHIFT_1_INPUT));
-    Serial.printf("Oxidizer Value: %s", oxidizerValue);
-    Serial.println();
-    request->send(200, "text/plain", oxidizerValue);
-  });
-
-  server.serveStatic("/", SPIFFS, "/").setDefaultFile("control-center.html");
-  server.begin();
   DrawIPToOLED();
+  //InitServerEndpoints();
+  
+}
+
+void InitAngleEncoder()
+{
+  ESP32Encoder::useInternalWeakPullResistors=UP;
+
+	// use pin 19 and 18 for the first encoder
+	encoder.attachHalfQuad(OX_ANGLE_ENCODER_1_IN, OX_ANGLE_ENCODER_2_IN);
+		
+	// set starting count value after attaching
+	//encoder.setCount(0);
+
+	// clear the encoder's raw count and set the tracked count to zero
+	encoder.clearCount();
+	Serial.println("Encoder Start = " + String((int32_t)encoder.getCount()));
 }
 
 void setup()
 {
   Serial.begin(115200);
-  
+
   initPins();
 
   // Mount SPIFFS
@@ -151,19 +180,32 @@ void setup()
     DrawStringToOLED(spiffsError);
     return;
   }
-  digitalWrite(LED_BUILTIN, HIGH);
 
-  //Display IP Address on Heltec OLED
-  Heltec.begin(true /*DisplayEnable Enable*/, false /*LoRa Disable*/, true /*Serial Enable*/, true /*PABOOST Enable*/, 470E6 /**/);
-  
+  Heltec.begin(true, false, true, true, 470E6);
+
   delay(2000);
-  initWifi();
+  InitWifi();
+  InitAngleEncoder();
+
+  InitServerEndpoints();
+  myServer.begin();
   
+  loadCell.initLoadCell();
 }
 
+void checkEncoderState()
+{
+  // Loop and read the count
+	//Serial.println("Encoder count = " + String((int32_t)encoder.getCount()));
+	delay(100);
+  encoder.resumeCount();
+	delay(100);
+  encoder.pauseCount();
+}
 
 void loop()
 {
-
+  checkEncoderState();
+  Serial.println("Load: " + String(loadCell.getLoad()));
+  delay(500);
 }
-

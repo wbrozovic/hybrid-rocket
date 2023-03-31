@@ -3,6 +3,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-.include/local_wifi_cred.h
-
+src/local_wifi_cred.h
+.DS_Store
 .fake
