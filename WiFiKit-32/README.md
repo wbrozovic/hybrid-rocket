@@ -1,1 +1,0 @@
-Testing/experimentation with the WiFi Kit 32 board from Heltec.
