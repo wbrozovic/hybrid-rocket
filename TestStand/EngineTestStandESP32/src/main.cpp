@@ -1,5 +1,12 @@
+/* #region Imports */
+
 #include <Arduino.h>
-#include <ArduinoJson.h>
+// #include <ArduinoJson.h>
+
+#include <SD.h>
+#include <SPI.h>
+#include <FS.h>
+
 #include <U8g2lib.h>
 #include <WiFi.h>
 #include "SPIFFS.h"
@@ -12,9 +19,11 @@
 #include "./imports/Server.h"
 #include "./imports/LoadCell.h"
 #include "./imports/local_wifi_cred.h"
+#include "./imports/SDLog.h"
+
+/* #endregion Imports */
 
 #define OLED_CLOCK 15 // PINS FOR THE OLED DISPLAY
-#define OLED_DATA 4
 #define OLED_RESET 16
 
 #define BUTTON 0
@@ -22,7 +31,7 @@
 #define ENG_IGNITE_OUTPUT 21
 
 #define HX711_CLK_PIN_INPUT 22
-#define HX711_DATA_PIN_INPUT 23
+#define HX711_DATA_PIN_INPUT 4
 
 #define OX_ANGLE_ENCODER_1_IN 34
 #define OX_ANGLE_ENCODER_2_IN 35
@@ -31,17 +40,26 @@
 #define INPUT_2 13
 #define INPUT_1 12
 
+#define MISO 19
+#define MOSI 23
+#define SCK 18
+#define CS 2
+#define DEFAULT_CS -1
+
 const char *ssid = SSID;
 const char *password = PASSWORD;
 
 ESP32Encoder encoder;
 ESP32Encoder encoder2;
 
-
 CustomAsyncWebServer myServer(80);
-Motor motor = Motor(ENABLE_A_OUT, INPUT_1, INPUT_2);
 
+Motor motor = Motor(ENABLE_A_OUT, INPUT_1, INPUT_2);
 LoadCell loadCell = LoadCell(HX711_DATA_PIN_INPUT, HX711_CLK_PIN_INPUT, 71490);
+
+File myFile;
+
+SDLog sdLog(DEFAULT_CS);
 
 static void initPins()
 {
@@ -60,6 +78,7 @@ static void initPins()
 
 void DrawIPToOLED()
 {
+  Heltec.display->displayOn();
   Heltec.display->clear();
   Heltec.display->drawString(0, 0, "Engine Test Stand v0.1");
   Heltec.display->drawString(0, 15, (WiFi.localIP().toString()));
@@ -130,6 +149,13 @@ void InitServerEndpoints()
 
     return thrustReadings + "]}";
   });
+
+  myServer.CommandSparkPlug([](){
+    digitalWrite(ENG_IGNITE_OUTPUT, HIGH);
+    delay(100);
+    digitalWrite(ENG_IGNITE_OUTPUT, LOW);
+    return "Spark Plug Ignited";
+  });
 }
 
 void InitWifi()
@@ -144,11 +170,10 @@ void InitWifi()
     Serial.println("Connecting to WiFi..");
   }
 
-  Serial.printf("Connected to the WiFi network %s", WiFi.localIP().toString());
-
+  Serial.println("Connected to the WiFi network");
+  Serial.println("IP address: " + (WiFi.localIP().toString()));
   DrawIPToOLED();
-  //InitServerEndpoints();
-  
+  InitServerEndpoints();
 }
 
 void InitAngleEncoder()
@@ -184,13 +209,20 @@ void setup()
   Heltec.begin(true, false, true, true, 470E6);
 
   delay(2000);
+
   InitWifi();
   InitAngleEncoder();
 
-  InitServerEndpoints();
+  digitalWrite(LED_BUILTIN, HIGH);
+
+
   myServer.begin();
-  
   loadCell.initLoadCell();
+
+  
+  sdLog.listDir(SD, "/", 0);
+  sdLog.openLogFile("/Logging.txt");
+  sdLog.writeFirstLines();
 }
 
 void checkEncoderState()
@@ -205,7 +237,7 @@ void checkEncoderState()
 
 void loop()
 {
-  checkEncoderState();
-  Serial.println("Load: " + String(loadCell.getLoad()));
-  delay(500);
+  //Time,Load,Encoder Count
+  String logData = String(__TIME__) + "," + String(loadCell.getLoad()) + "," + String(encoder.getCount());
+  sdLog.writeToLogFile(logData);
 }

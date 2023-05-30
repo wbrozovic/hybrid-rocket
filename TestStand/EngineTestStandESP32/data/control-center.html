@@ -4,10 +4,10 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>Engine Testing</title>
-	<link rel="stylesheet" type="text/css" href="styles.css" />
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<!-- <link rel="stylesheet" type="text/css" href="styles.css" /> -->
+	<!-- <link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;700&display=swap" rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;700&display=swap" rel="stylesheet" /> -->
 	<!-- <script src="./asci-chart/asciichart-master/asciichart.js"></script> -->
 </head>
 
@@ -70,6 +70,388 @@
 			</div>
 		</div>
 	</div>
+
+	<style>
+		html, body {
+    background-color: #f4f4f9;
+    height: 100%;
+    width: 100%;
+    font-family: 'monospace';
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    margin: 0;
+}
+
+.center-card {
+    height: 100%;
+    width: 90%;
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 3px, rgb(0 0 0 / 5%) 0px 1px 2px 0px;
+    margin: 3rem;
+    background-color: #1f1f1e;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 2rem;
+}
+
+.h1 {
+    color: #f4f4f9;
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.h2 {
+    color: #f4f4f9;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+p {
+    color: #f4f4f9;
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+.btn-container {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+.btn-container:first-child {
+    margin-right: 0.5em;
+}
+
+.btn {
+    background-color: #f4f4f9;
+    border-radius: 4px;
+    color: #0C0F0A;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border: 0px solid transparent;
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 3px, rgb(0 0 0 / 5%) 0px 1px 2px 0px;
+    min-width: fit-content;
+    font-weight: 700;
+    font-size: large;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.open-ox-btn {
+    background-color: #1982c4;
+    color: #f4f4f9;
+}
+
+.btn-container .btn {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.btn:hover {
+    background-color: #D8D8E9;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+.open-ox-btn:hover {
+    background-color: #136090;
+    color: #f4f4f9;
+}
+
+.danger-btn {
+    background-color: #fe4134;
+    border-radius: 4px;
+    color: #f4f4f9;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border: 0px solid transparent;
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 3px, rgb(0 0 0 / 5%) 0px 1px 2px 0px;
+    min-width: fit-content;
+    font-weight: 700;
+    font-size: large;
+}
+
+.danger-btn:hover {
+    background-color: #A20C01;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.danger-btn__yellow {
+    background-color: #FFCB1F;
+    color: #0C0F0A;
+}
+
+.danger-btn__yellow:hover {
+    background-color: #CC9C00;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 3px, rgb(0 0 0 / 5%) 0px 1px 2px 0px;
+    z-index: 10000;
+    visibility: hidden;
+}
+
+.confirm-modal {
+    position: absolute;
+    top: 35%;
+    z-index: 100000;
+    background-color: #A20C01;
+    border-radius: 8px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    visibility: hidden;
+}
+
+.confirm-modal__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.secondary-btn {
+    background-color: transparent;
+    color: #f4f4f9;
+    border: 1px solid #f4f4f9;
+    border-radius: 4px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 3px, rgb(0 0 0 / 5%) 0px 1px 2px 0px;
+    min-width: fit-content;
+    font-weight: 700;
+    font-size: large;
+}
+
+.secondary-btn:hover {
+    color: #D8D8E9;
+    border-color: #D8D8E9;
+    cursor: pointer;
+    transition: border-color, color 0.2s ease-in-out;
+}
+
+.modal-btn-container button:last-child {
+    margin-left: 1rem;
+}
+
+.data-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 2rem;
+    width: inherit;
+}
+
+.number-spinner {
+    /* height: 100%; */
+    flex-grow: 1;
+    border: 1px solid #eee;
+    border-right: none;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    padding-left: 0.75rem;
+}
+
+.spinner-holder {
+    display: flex;
+    flex-grow: 1;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button
+{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-spinner-btn {
+    /* position: relative; */
+    cursor: pointer;
+    /* border-left: 1px solid #eee; */
+    width: 20px;
+    text-align: center;
+    background-color: #748386;
+    color: #f4f4f9;
+    font-size: 13px;
+    font-family: monospace;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    border: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+}
+
+.number-spinner-btn:hover {
+    background-color: #424B4C;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.number-spinner__btn-up {
+    /* position: absolute; */
+    top: 0;
+    right: 0;
+    height: 50%;
+    width: 2rem;
+    border-top-right-radius: 4px;
+}
+.number-spinner__btn-down {
+    /* position: absolute; */
+    bottom: -1px;
+    right: 0;
+    height: 50%;
+    width: 2rem;
+    border-bottom-right-radius: 4px;
+}
+
+.ox-data-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+    flex-grow: 1;
+}
+
+.ox-valve-meter {
+    height: inherit; 
+    width: inherit; 
+    border-radius: 150px 150px 0 0; 
+    background-color: #f4f4f9;
+}
+
+/* Semi-circle gauge from stack overflow https://stackoverflow.com/questions/67235098/how-to-create-semi-circle-ellipse-with-html-css-like-a-gauge-speedometer*/
+.gauge{
+    height: 1.5rem;
+    flex-grow: 1;
+    width: -webkit-fill-available;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+}
+.gauge-overlay {
+    position: relative;
+    top: 0;
+    left: 0;
+    background-color: #1982C4;
+    width: 0%;
+    height: inherit;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.ox-gauge {
+    background-color: #f4f4f9;
+}
+
+.gauge .arc{
+    background-image:
+        radial-gradient(#1f1f1e 0, #1f1f1e 60%, transparent 60%),
+        conic-gradient(#f4f4f9 0, #93CDF1 100deg, #1982C4 135deg, #093048 180deg, #1f1f1e 180deg, #1f1f1e 360deg);
+    background-position: center center, center center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%, 100% 100%;
+    border-radius: 50%;
+    border-style: none;
+    height: 170px;
+    position: relative;
+    transform: rotate(-90deg);
+    width: 100%;
+}
+.gauge .pointer{
+    background: #f4f4f9;
+    border: 1px solid #f4f4f9;
+    border-radius: 5px;
+    bottom: 0;
+    content: '';
+    height: 6px;
+    left: 0;
+    position: absolute;
+    transform: rotate(135deg) translateX(2px) translateY(-6px);
+    transform-origin: 85px 0;
+    width: 20px;
+    z-index: 5;
+}
+
+.gauge .pointer:hover {
+    cursor: pointer;
+    background-color: #D8D8E9;
+}
+
+.gauge .mask::before,
+.gauge .mask::after{
+    background-image: radial-gradient(transparent 0, transparent 50%, #1f1f1e 50%, #1f1f1e 100%);
+    clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0% 100%);
+    content: '';
+    height: 18px;
+    position: absolute;
+    width: 18px;
+}
+.gauge .mask::before{
+    left: -2px;
+    bottom: 0;
+}
+.gauge .mask::after{
+    bottom: 0;
+    right: -2px;
+}
+.gauge .label{
+    bottom: 20px;
+    font-size: 16px;
+    font-weight: 700;
+    left: 0;
+    line-height: 26px;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    color: #f4f4f9;
+}
+
+.spacer {
+    flex-grow: 1;
+    width: inherit;
+}
+
+.ascii-chart {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    height: 20em;
+}
+
+.chart-section {
+    width: inherit;
+}
+	</style>
+
 </body>
 
 </html>
