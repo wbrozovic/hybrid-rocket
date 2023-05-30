@@ -1,5 +1,5 @@
 .DS_Store
-.DS_Store
+*/.DS_Store
 .vscode
 Documents/.DS_Store
 Documents/.DS_Store
@@ -11,3 +11,5 @@ Documents/.DS_Store
 local_wifi_cred.h
 .DS_Store
 .fake
+local_wifi_cred.h
+

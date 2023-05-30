@@ -7,7 +7,8 @@ public:
     using OxidizerValveCallback = std::function<int()>;
     // Thrust readingCallback returns an array of float
     using ThrustReadingCallback = std::function<String()>;
-    
+    using CommandSparkPlugCallback = std::function<String()>;
+
     CustomAsyncWebServer(int port): server(port) {
         server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request)
         { 
@@ -61,6 +62,16 @@ public:
             String thrustReading = thrustReadingCallback();
             
             request->send(200, "text/plain", thrustReading);
+        });
+    }
+
+    void CommandSparkPlug(CommandSparkPlugCallback commandSparkPlugCallback) 
+    {
+        server.on("/spark-plug", HTTP_GET, [this, commandSparkPlugCallback](AsyncWebServerRequest *request)
+        {
+            String sparkPlugResponse = commandSparkPlugCallback();
+
+            request->send(200, "text/plain", sparkPlugResponse);
         });
     }
 
