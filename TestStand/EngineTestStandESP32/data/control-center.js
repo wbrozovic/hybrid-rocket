@@ -219,8 +219,10 @@ async function TickOxygenClosed(event) {
         });
 }
 
-
+let shouldContinue = true;
 async function GetThrustLoad() {
+    if (!shouldContinue) return;
+    
     const getThrustLoad = async () => {
         const response = await fetch(`/thrust-load`)
           .then(response => response.text())
@@ -232,6 +234,7 @@ async function GetThrustLoad() {
     const thrustLoad = await getThrustLoad();
 
     updateThrustLoadChart(thrustLoad.thrust);
+    setTimeout(GetThrustLoad, 1000);
 }
 
 /**
@@ -247,22 +250,22 @@ async function updateThrustLoadChart(thrustLoadReadings) {
     console.log(asciichart.plot(ThrustMasterSeries));
 }
 
-//setInterval(ControlLoop, 50);
-var GetThrustLoadID = null;
 async function InitThrustInterval() {
+    shouldContinue = true;
     var thrustBtn = document.getElementById("thrust-stream-btn");
     thrustBtn.removeEventListener("click", InitThrustInterval);
     thrustBtn.addEventListener("click", StopThrustInterval);
     thrustBtn.innerHTML = "Stop Thrust Readings";
-    GetThrustLoadID = setInterval(GetThrustLoad, 500);
+    GetThrustLoad();
 }
 
 function StopThrustInterval() {
+    shouldContinue = false;
     var thrustBtn = document.getElementById("thrust-stream-btn");
     thrustBtn.removeEventListener("click", StopThrustInterval);
     thrustBtn.addEventListener("click", InitThrustInterval);
     thrustBtn.innerHTML = "Read Thrust";
-    clearInterval(GetThrustLoadID);
+    
 }
 
 var thrustChartContainer = document.getElementById("ascii-chart-container");
