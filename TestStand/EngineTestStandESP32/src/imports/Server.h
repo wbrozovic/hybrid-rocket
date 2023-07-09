@@ -9,6 +9,8 @@ public:
     using ThrustReadingCallback = std::function<String()>;
     using CommandSparkPlugCallback = std::function<String()>;
 
+    using HandleLogCallback = std::function<String()>;
+
     CustomAsyncWebServer(int port): server(port) {
         server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request)
         { 
@@ -31,6 +33,7 @@ public:
         { 
             request->send(SPIFFS, "/asciichart.js", "text/javascript"); 
         });
+        
     }
 
     void begin() {
@@ -67,11 +70,21 @@ public:
 
     void CommandSparkPlug(CommandSparkPlugCallback commandSparkPlugCallback) 
     {
-        server.on("/spark-plug", HTTP_GET, [this, commandSparkPlugCallback](AsyncWebServerRequest *request)
+        server.on("/spark", HTTP_GET, [this, commandSparkPlugCallback](AsyncWebServerRequest *request)
         {
             String sparkPlugResponse = commandSparkPlugCallback();
 
             request->send(200, "text/plain", sparkPlugResponse);
+        });
+    }
+
+    void HandleLog(HandleLogCallback handleLogCallback) 
+    {
+        server.on("/log", HTTP_GET, [this, handleLogCallback](AsyncWebServerRequest *request)
+        {
+            String loggingStatus = handleLogCallback();
+
+            request->send(200, "text/plain", "Logging status: " + loggingStatus);
         });
     }
 

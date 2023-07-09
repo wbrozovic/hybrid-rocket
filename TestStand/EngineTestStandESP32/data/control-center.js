@@ -265,7 +265,34 @@ function StopThrustInterval() {
     thrustBtn.removeEventListener("click", StopThrustInterval);
     thrustBtn.addEventListener("click", InitThrustInterval);
     thrustBtn.innerHTML = "Read Thrust";
-    
+}
+
+async function SetLog() {
+    const setLog = async () => {
+        const response = await fetch(`/log`)
+            .then(response => response.text())
+            //.then(data => JSON.parse(data))
+            .catch(err => console.log(err));
+        return response;
+    };
+    const response = await setLog()
+        .then((resp) => {
+            console.log('Log: ', resp);
+        });
+}
+
+async function FireSpark() {
+    const fireSpark = async () => {
+        const response = await fetch(`/spark`)
+            .then(response => response.text())
+            //.then(data => JSON.parse(data))
+            .catch(err => console.log(err));
+        return response;
+    };
+    const response = await fireSpark()
+        .then((resp) => {
+            console.log('Spark: ', resp);
+        });
 }
 
 var thrustChartContainer = document.getElementById("ascii-chart-container");
@@ -273,3 +300,9 @@ thrustChartContainer.innerHTML = asciichart.plot(ThrustMasterSeries, { height: 5
 
 var thrustBtn = document.getElementById("thrust-stream-btn");
 thrustBtn.addEventListener("click", InitThrustInterval);
+
+var logBtn = document.getElementById("log-stream-btn");
+logBtn.addEventListener("click", SetLog);
+
+var sparkBtn = document.getElementById("spark-btn");
+sparkBtn.addEventListener("click", FireSpark);

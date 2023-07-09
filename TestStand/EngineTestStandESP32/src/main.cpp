@@ -3,6 +3,11 @@
 #include <Arduino.h>
 // #include <ArduinoJson.h>
 
+// #include <chrono>
+// #include <ctime>
+// #include <iomanip>
+// #include <sstream>
+
 #include <SD.h>
 #include <SPI.h>
 #include <FS.h>
@@ -49,6 +54,10 @@
 const char *ssid = SSID;
 const char *password = PASSWORD;
 
+
+
+bool isLogging = false;
+
 ESP32Encoder encoder;
 ESP32Encoder encoder2;
 
@@ -82,7 +91,7 @@ void DrawIPToOLED()
   Heltec.display->clear();
   Heltec.display->drawString(0, 0, "Engine Test Stand v0.1");
   Heltec.display->drawString(0, 15, (WiFi.localIP().toString()));
-  Heltec.display->drawString(0, 50, "Count OFF");
+  //Heltec.display->drawString(0, 50, "Count OFF");
   Heltec.display->display();
 }
 
@@ -90,7 +99,7 @@ void DrawStringToOLED(String str)
 {
   Heltec.display->clear();
   Heltec.display->drawString(0, 0, "Engine Test Stand v0.1");
-  Heltec.display->drawString(0, 15, (WiFi.localIP().toString()));
+  //Heltec.display->drawString(0, 15, (WiFi.localIP().toString()));
   Heltec.display->drawString(0, 50, "New String: " + str);
   Heltec.display->display();
 }
@@ -125,16 +134,27 @@ int EstimateMotorTorqueWithCurrentFlow()
 
 void InitServerEndpoints() 
 {
+  
   myServer.SetOxidizerTickOpenHandler([](){
-    motor.RotateMotorForwards();
-    delay(1000);
+    motor.stop();
+    for (int i = 0; i < 5000000; i++)
+    {
+      motor.RotateMotorForwards();
+      
+    }
     motor.stop();
     return encoder.getCount();
   });
 
   myServer.SetOxidizerTickCloseHandler([](){
-    motor.RotateMotorBackwards();
-    delay(1000);
+    motor.stop();
+    for (int i = 0; i < 5000000; i++)
+    {
+      motor.RotateMotorBackwards();
+    }
+      motor.stop();
+    
+    //delay(1000);
     motor.stop();
     return encoder.getCount();
   });
@@ -151,11 +171,36 @@ void InitServerEndpoints()
   });
 
   myServer.CommandSparkPlug([](){
-    digitalWrite(ENG_IGNITE_OUTPUT, HIGH);
-    delay(100);
-    digitalWrite(ENG_IGNITE_OUTPUT, LOW);
+    for (int i = 0; i < 10; i++)
+    {
+      digitalWrite(ENG_IGNITE_OUTPUT, HIGH);
+      
+      long mili_start = millis();
+      long mili_end = millis();
+
+      while(mili_end - mili_start < 30)
+      {
+        //do nothing
+        mili_end = millis();
+      }
+      digitalWrite(ENG_IGNITE_OUTPUT, LOW);
+
+      mili_start = millis();
+      mili_end = millis();
+      while(mili_end - mili_start < 30)
+      {
+        //do nothing
+        mili_end = millis();
+      }
+    }
     return "Spark Plug Ignited";
   });
+
+  myServer.HandleLog([](){
+    isLogging = !isLogging;
+    return isLogging ? "true" : "false";
+  });
+
 }
 
 void InitWifi()
@@ -196,7 +241,7 @@ void setup()
   Serial.begin(115200);
 
   initPins();
-
+  //DrawStringToOLED("Initializing...");
   // Mount SPIFFS
   String spiffsError = "An Error has occurred while mounting SPIFFS";
   if (!SPIFFS.begin(true))
@@ -215,7 +260,6 @@ void setup()
 
   digitalWrite(LED_BUILTIN, HIGH);
 
-
   myServer.begin();
   loadCell.initLoadCell();
 
@@ -223,6 +267,7 @@ void setup()
   sdLog.listDir(SD, "/", 0);
   sdLog.openLogFile("/Logging.txt");
   sdLog.writeFirstLines();
+  DrawIPToOLED();
 }
 
 void checkEncoderState()
@@ -235,9 +280,34 @@ void checkEncoderState()
   encoder.pauseCount();
 }
 
+// String time_point_to_string(const std::chrono::system_clock::time_point& tp) {
+//     // Convert time_point to time_t.
+//     std::time_t time_t = std::chrono::system_clock::to_time_t(tp);
+
+//     // Convert time_t to struct tm.
+//     std::tm tm = *std::localtime(&time_t);
+
+//     // Use strftime to format struct tm as a string.
+//     std::ostringstream oss;
+//     oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
+
+//     return String(oss.str().c_str());
+// }
+
+
 void loop()
 {
-  //Time,Load,Encoder Count
-  String logData = String(__TIME__) + "," + String(loadCell.getLoad()) + "," + String(encoder.getCount());
-  sdLog.writeToLogFile(logData);
+  // get the current time
+ // auto now = std::chrono::high_resolution_clock::now();
+
+  // check if a second has passed
+  if (isLogging) {
+      // convert now to a string
+     // String now_str = time_point_to_string(now);
+
+      //Time,Load,Encoder Count
+      String logData = "," + String(loadCell.getLoad()) + "," + String(encoder.getCount());
+      sdLog.writeToLogFile(logData);
+      Serial.println(logData);
+  }
 }

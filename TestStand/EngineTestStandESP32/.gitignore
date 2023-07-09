@@ -5,3 +5,5 @@
 .vscode/ipch
 
 .fake
+
+src/imports/local_wifi_cred.h

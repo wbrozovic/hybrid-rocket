@@ -27,6 +27,8 @@
 				class="ascii-chart ascii-chart-container">
 			</div>
 			<button id="thrust-stream-btn" class="btn">Read Thrust</button>
+            <button id="log-stream-btn" class="btn">Begin Logging</button>
+            <button id="spark-btn" class="btn danger-btn">Fire Spark Plug</button>
 		</div>
 		<div id="data-container" class="data-container">
 			<div id="ox-data-container" class="ox-data-container">
@@ -47,7 +49,7 @@
 			</div>
 		</div>
 		<div id="spacer" class="spacer"></div>
-		<button id="engine-ignition" class="danger-btn danger-btn__yellow" onclick="areYouSure(event)">
+		<button hidden id="engine-ignition" class="danger-btn danger-btn__yellow" onclick="areYouSure(event)">
 			Ignite Engine
 		</button>
 	</div>
