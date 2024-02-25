@@ -21,5 +21,7 @@ Please create a branch with the naming convention [your_name or nickname or init
 
 - Platform.io - https://platformio.org/
 -- Search engine for embeded development needs
+- Platformio for vscode
+-- Use this if you develop in vscode - it helps you compile and upload your code to the ESP32
 - ESP32 Tutorials - https://esp32io.com/tutorials/esp32-button-toggle-led
 - Using Multiple SPI busses & custom SPI Pins:  https://randomnerdtutorials.com/esp32-spi-communication-arduino/#custom-spi-pins
